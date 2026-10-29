@@ -15,8 +15,9 @@ public class RunModifiersTest {
     public void defaultsAreVanilla() {
         RunModifiers mods = RunModifiers.none();
         assertTrue(mods.isVanilla());
-        assertEquals(1f, mods.horizontalSpeed(100f), 0.0001f);
-        assertEquals(1f, mods.jumpImpulse(100f), 0.0001f);
+        // Vanilla means the base values pass through untouched.
+        assertEquals(100f, mods.horizontalSpeed(100f), 0.0001f);
+        assertEquals(100f, mods.jumpImpulse(100f), 0.0001f);
         assertEquals(1, mods.coinsPerPickup());
         assertTrue(mods.obstaclesDamage());
     }
