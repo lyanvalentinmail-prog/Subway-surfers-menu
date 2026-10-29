@@ -83,14 +83,17 @@ jobs:
           AAPT="$(ls -1 "$ANDROID_HOME"/build-tools/*/aapt2 | tail -n1)"
           APK="$(ls -1 dist/*-release-*.apk | head -n1)"
           {
-            "$AAPT" dump badging "$APK" 2>&1 | grep -E "launchable-activity|application-label:|sdkVersion|package: name" | head -n 6
-            "$AAPT" dump xmltree --file AndroidManifest.xml "$APK" 2>/dev/null | grep -A12 'E: provider' | head -n 14
-            echo "service:  $("$AAPT" dump xmltree --file AndroidManifest.xml "$APK" 2>/dev/null | grep -oE 'com\.submenus\.overlay\.OverlayService' | head -n1)"
-            echo "dex: $(unzip -l "$APK" | grep -c '\.dex') archivo(s) classes.dex"
+            echo "### Verificación del APK"
+            echo ""
+            echo "\`\`\`"
+            "$AAPT" dump badging "$APK" 2>/dev/null \
+              | grep -E "package: name|launchable-activity|application-label:" || true
+            echo "provider authority: $("$AAPT" dump xmltree --file AndroidManifest.xml "$APK" 2>/dev/null \
+              | grep -oE 'authorities[^=]*="com\.submenus\.overlay\.settings"' | head -n1)"
+            echo "dex files: $(unzip -l "$APK" | grep -c '\.dex')"
             echo "size: $(du -h "$APK" | cut -f1)"
-          } | while IFS= read -r line; do
-            echo "::notice::${line:0:900}"
-          done
+            echo "\`\`\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
