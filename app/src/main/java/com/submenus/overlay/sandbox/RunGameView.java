@@ -54,13 +54,8 @@ public class RunGameView extends View implements MenuRepository.Listener {
 
     private final List<Entity> entities = new ArrayList<>();
 
-    // Live gameplay modifiers read from the menu.
-    private float speedMultiplier = 1f;
-    private float jumpMultiplier = 1f;
-    private boolean invincible;
-    private boolean coinMultiplierEnabled;
-    private int coinMultiplier = 1;
-    private boolean keysCounterEnabled;
+    // Live gameplay modifiers read from the menu (pure mapping, unit tested).
+    private RunModifiers mods = RunModifiers.none();
 
     // Game state.
     private boolean running;
@@ -162,9 +157,9 @@ public class RunGameView extends View implements MenuRepository.Listener {
 
         // Base speed grows slowly with distance, then the menu multiplier on top.
         float baseSpeed = Theme.dp(getContext(), 170f) * (1f + Math.min(1.2f, timeAlive * 0.012f));
-        float speed = baseSpeed * speedMultiplier;
+        float speed = mods.horizontalSpeed(baseSpeed);
 
-        score += Math.round(dt * 12f * speedMultiplier);
+        score += Math.round(dt * 12f * mods.speedMultiplier);
 
         // Jump physics: the menu multiplier scales the impulse (High Jump).
         if (!onGround) {
@@ -180,7 +175,7 @@ public class RunGameView extends View implements MenuRepository.Listener {
         spawnTimer -= dt;
         if (spawnTimer <= 0f) {
             spawnObstacle();
-            float gap = Math.max(0.55f, 1.35f - speedMultiplier * 0.22f);
+            float gap = Math.max(0.55f, 1.35f - mods.speedMultiplier * 0.22f);
             spawnTimer = gap + random.nextFloat() * 0.45f;
         }
 
@@ -222,13 +217,13 @@ public class RunGameView extends View implements MenuRepository.Listener {
     private void handlePickup(Entity entity) {
         switch (entity.type) {
             case TYPE_COIN:
-                coins += coinMultiplierEnabled ? coinMultiplier : 1;
+                coins += mods.coinsPerPickup();
                 break;
             case TYPE_KEY:
                 keys += 1;
                 break;
             default:
-                if (invincible) {
+                if (mods.invincible) {
                     invincibleFlash = 1f;
                     score += 25;
                 } else {
@@ -288,7 +283,7 @@ public class RunGameView extends View implements MenuRepository.Listener {
             if (onGround) {
                 onGround = false;
                 // High Jump scales the initial impulse.
-                verticalSpeed = Theme.dp(getContext(), 1150f) * jumpMultiplier;
+                verticalSpeed = mods.jumpImpulse(Theme.dp(getContext(), 1150f));
                 performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);
             }
             return true;
@@ -385,7 +380,7 @@ public class RunGameView extends View implements MenuRepository.Listener {
 
     private void drawTrackLines(Canvas canvas, int w) {
         paint.setColor(Theme.withAlpha(Theme.TEXT_DIM, 0.18f));
-        float offset = (timeAlive * Theme.dp(getContext(), 170f) * speedMultiplier)
+        float offset = (timeAlive * Theme.dp(getContext(), 170f) * mods.speedMultiplier)
                 % Theme.dp(getContext(), 64f);
         for (float x = -offset; x < w; x += Theme.dp(getContext(), 64f)) {
             canvas.drawRect(x, groundY + Theme.dp(getContext(), 26f),
@@ -457,7 +452,7 @@ public class RunGameView extends View implements MenuRepository.Listener {
         canvas.drawRoundRect(rect, Theme.dp(getContext(), 6f), Theme.dp(getContext(), 6f), paint);
 
         // Invincibility aura (real: while the menu flag is on, obstacles do nothing).
-        if (invincible) {
+        if (mods.invincible) {
             float pulse = 0.55f + 0.35f * (float) Math.sin(timeAlive * 6f);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(Theme.dp(getContext(), 3f));
@@ -489,7 +484,7 @@ public class RunGameView extends View implements MenuRepository.Listener {
                 Theme.withAlpha(Theme.GREEN, 0.16f), Theme.GREEN_LIGHT,
                 String.format(Locale.US, "\u2691 %d", keys));
 
-        if (keysCounterEnabled) {
+        if (mods.keysCounterEnabled) {
             textPaint.setTextSize(Theme.sp(getContext(), 10f));
             textPaint.setColor(Theme.TEXT_MUTED);
             canvas.drawText("KEYS COUNTER ON",
@@ -547,12 +542,7 @@ public class RunGameView extends View implements MenuRepository.Listener {
     }
 
     private void applySnapshot(MenuSnapshot snapshot) {
-        speedMultiplier = snapshot.speedEnabled ? snapshot.speedMultiplier : 1f;
-        jumpMultiplier = snapshot.highJumpEnabled ? snapshot.highJumpMultiplier : 1f;
-        invincible = snapshot.invincibilityEnabled;
-        coinMultiplierEnabled = snapshot.coinMultiplierEnabled;
-        coinMultiplier = snapshot.coinMultiplier;
-        keysCounterEnabled = snapshot.keysCounterEnabled;
+        mods = RunModifiers.from(snapshot);
     }
 
     private void notifyHud() {
