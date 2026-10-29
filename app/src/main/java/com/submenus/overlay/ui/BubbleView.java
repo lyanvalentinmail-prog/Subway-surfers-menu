@@ -26,6 +26,7 @@ public class BubbleView extends View {
     private boolean integrationConnected;
     private float pulse;
     private float pressScale = 1f;
+    private int paddingPx;
     private ValueAnimator pulseAnimator;
     private ValueAnimator pressAnimator;
 
@@ -37,6 +38,12 @@ public class BubbleView extends View {
         ringPaint.setStyle(Paint.Style.STROKE);
         iconPaint.setStyle(Paint.Style.FILL);
         iconPaint.setColor(Theme.BG_DEEP);
+    }
+
+    /** Transparent margin kept around the disc so the halo is not clipped by the window. */
+    public void setGlowPadding(int px) {
+        this.paddingPx = Math.max(0, px);
+        invalidate();
     }
 
     public void setAnimationsEnabled(boolean enabled) {
@@ -130,7 +137,7 @@ public class BubbleView extends View {
         float h = getHeight();
         float cx = w / 2f;
         float cy = h / 2f;
-        float baseRadius = Math.min(w, h) / 2f;
+        float baseRadius = Math.max(1f, Math.min(w, h) / 2f - paddingPx);
         float radius = baseRadius * pressScale;
 
         // Pulsing halo (two expanding rings).

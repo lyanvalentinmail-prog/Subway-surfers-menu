@@ -177,23 +177,21 @@ public final class MenuRepository {
      * broadcast is always delivered on the main thread.
      */
     public void publish() {
-        final MenuSnapshot snapshot = snapshot();
         final long now = System.currentTimeMillis();
-        prefs.setSnapshotJson(snapshot.toJsonString());
         prefs.setLastUpdate(now);
+        final MenuSnapshot snapshot = snapshot();
+        prefs.setSnapshotJson(snapshot.toJsonString());
 
         Runnable dispatch = () -> {
             Intent intent = new Intent(BridgeContract.ACTION_SETTINGS_CHANGED);
-            intent.setPackage(appContext.getPackageName());
-            // The bridge contract does not expose an Intent overload with permission,
-            // so the permission is enforced by the provider; the broadcast is used for
-            // in-process refreshes and for integrations in the same app.
             intent.putExtra(BridgeContract.EXTRA_SNAPSHOT_JSON, snapshot.toJsonString());
             intent.putExtra(BridgeContract.EXTRA_UPDATED_AT, now);
             try {
-                appContext.sendBroadcast(intent);
+                // Only receivers holding the bridge permission get this broadcast;
+                // the provider remains the source of truth.
+                appContext.sendBroadcast(intent, BridgeContract.PERMISSION_READ);
             } catch (Exception ignored) {
-                // Broadcast is best effort; the provider is the source of truth.
+                // Broadcast is best effort.
             }
         };
 

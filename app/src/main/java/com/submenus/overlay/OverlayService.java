@@ -38,6 +38,7 @@ public class OverlayService extends Service implements MenuRepository.Listener, 
     private static final String CHANNEL_ID = "subway_menu_overlay";
     private static final int NOTIFICATION_ID = 4242;
     private static final long HEARTBEAT_POLL_MS = 2_000L;
+    private static final int GLOW_PADDING_DP = 12;
 
     /** True while the service is alive (used by the activity to refresh its UI). */
     public static volatile boolean isRunning = false;
@@ -159,11 +160,12 @@ public class OverlayService extends Service implements MenuRepository.Listener, 
 
     private void showBubble() {
         int sizeDp = prefs.getButtonSizeDp();
-        int sizePx = Theme.dp(this, sizeDp);
+        int sizePx = windowSizeFor(sizeDp);
         lastBubbleSizeDp = sizeDp;
 
         bubbleView = new BubbleView(this);
         bubbleView.setAnimationsEnabled(prefs.isAnimationsEnabled());
+        bubbleView.setGlowPadding(Theme.dp(this, GLOW_PADDING_DP));
         bubbleView.setOpen(false);
 
         bubbleParams = new WindowManager.LayoutParams(
@@ -468,9 +470,13 @@ public class OverlayService extends Service implements MenuRepository.Listener, 
         updateBridgeState();
     }
 
+    private int windowSizeFor(int sizeDp) {
+        return Theme.dp(this, sizeDp) + Theme.dp(this, GLOW_PADDING_DP) * 2;
+    }
+
     private void resizeBubble(int sizeDp) {
         lastBubbleSizeDp = sizeDp;
-        int sizePx = Theme.dp(this, sizeDp);
+        int sizePx = windowSizeFor(sizeDp);
         bubbleParams.width = sizePx;
         bubbleParams.height = sizePx;
         bubbleParams.x = clampX(bubbleParams.x, sizePx);

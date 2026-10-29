@@ -44,6 +44,9 @@ jobs:
           java -version
           gradle --version
 
+      - name: Run unit tests
+        run: gradle --no-daemon --console=plain testDebugUnitTest
+
       - name: Build debug + release APKs
         run: |
           set -o pipefail

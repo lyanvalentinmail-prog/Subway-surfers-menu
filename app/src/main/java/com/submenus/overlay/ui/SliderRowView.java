@@ -1,9 +1,11 @@
 package com.submenus.overlay.ui;
 
 import android.content.Context;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -104,14 +106,29 @@ public class SliderRowView extends LinearLayout {
     }
 
     private void styleSeekBar(Context context) {
-        int height = Theme.dp(context, 8f);
-        int radius = height / 2;
+        int trackHeight = Theme.dp(context, 8f);
+        int radius = trackHeight / 2;
 
-        GradientDrawable track = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
-                new int[]{Theme.GREEN, Theme.BLUE});
-        track.setCornerRadius(radius);
-        track.setSize(0, height);
-        seekBar.setProgressDrawable(track);
+        // Background track (dark) + clipped gradient progress, the same structure as
+        // the classic <layer-list> progress drawable, built in code.
+        GradientDrawable background = new GradientDrawable();
+        background.setShape(GradientDrawable.RECTANGLE);
+        background.setColor(Theme.withAlpha(Theme.STROKE, 0.85f));
+        background.setCornerRadius(radius);
+
+        GradientDrawable progressShape = new GradientDrawable(
+                GradientDrawable.Orientation.LEFT_RIGHT, new int[]{Theme.GREEN, Theme.BLUE});
+        progressShape.setShape(GradientDrawable.RECTANGLE);
+        progressShape.setCornerRadius(radius);
+
+        ClipDrawable clipped = new ClipDrawable(progressShape, Gravity.START, ClipDrawable.HORIZONTAL);
+        LayerDrawable layers = new LayerDrawable(new Drawable[]{background, clipped});
+        layers.setId(0, android.R.id.background);
+        layers.setId(1, android.R.id.progress);
+        layers.setLayerInset(1, 0, 0, 0, 0);
+        seekBar.setProgressDrawable(layers);
+        seekBar.setMaxHeight(trackHeight);
+        seekBar.setMinHeight(trackHeight);
 
         GradientDrawable thumb = new GradientDrawable();
         thumb.setShape(GradientDrawable.OVAL);
@@ -123,12 +140,7 @@ public class SliderRowView extends LinearLayout {
         seekBar.setThumbOffset(Theme.dp(context, 1f));
         seekBar.setSplitTrack(false);
         seekBar.setPadding(Theme.dp(context, 2f), 0, Theme.dp(context, 2f), 0);
-        seekBar.getProgressDrawable().setAlpha(255);
         seekBar.setBackground(null);
-
-        if (seekBar.getThumb() != null) {
-            seekBar.getThumb().setColorFilter(Theme.withAlpha(Theme.GREEN, 1f), PorterDuff.Mode.SRC_ATOP);
-        }
     }
 
     private int steps() {

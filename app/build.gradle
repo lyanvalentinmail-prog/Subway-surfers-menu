@@ -48,6 +48,8 @@ android {
 }
 
 dependencies {
-    // Intentionally dependency-free: the whole app is built on the Android framework
-    // so the APK builds deterministically on GitHub Actions with no extra downloads.
+    // The app itself is dependency-free: everything is built on the Android framework,
+    // so the APK compiles deterministically on GitHub Actions.
+    // JUnit is only used by the JVM unit tests of the bridge contract.
+    testImplementation 'junit:junit:4.13.2'
 }
