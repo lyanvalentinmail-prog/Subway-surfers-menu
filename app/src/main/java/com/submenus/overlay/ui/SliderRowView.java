@@ -105,7 +105,7 @@ public class SliderRowView extends LinearLayout {
 
     private void styleSeekBar(Context context) {
         int height = Theme.dp(context, 8f);
-        int radius = height / 2f;
+        int radius = height / 2;
 
         GradientDrawable track = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
                 new int[]{Theme.GREEN, Theme.BLUE});

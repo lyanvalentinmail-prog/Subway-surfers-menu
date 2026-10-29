@@ -112,18 +112,18 @@ public class MainActivity extends Activity implements MenuRepository.Listener {
 
     private void buildStatusRows() {
         View permissionRow = createStatusRow(getString(R.string.permission_label));
-        permissionDot = permissionRow.getTag(R.id.tag_dot);
+        permissionDot = (View) permissionRow.getTag(R.id.tag_dot);
         permissionValue = (TextView) permissionRow.getTag(R.id.tag_value);
         permissionRow.setOnClickListener(v -> requestOverlayPermission());
         statusContainer.addView(permissionRow);
 
         View serviceRow = createStatusRow(getString(R.string.service_label));
-        serviceDot = serviceRow.getTag(R.id.tag_dot);
+        serviceDot = (View) serviceRow.getTag(R.id.tag_dot);
         serviceValue = (TextView) serviceRow.getTag(R.id.tag_value);
         statusContainer.addView(serviceRow);
 
         View bridgeRow = createStatusRow(getString(R.string.bridge_label));
-        bridgeDot = bridgeRow.getTag(R.id.tag_dot);
+        bridgeDot = (View) bridgeRow.getTag(R.id.tag_dot);
         bridgeValue = (TextView) bridgeRow.getTag(R.id.tag_value);
         bridgeRow.setOnClickListener(v ->
                 startActivity(new Intent(this, InspectorActivity.class)));

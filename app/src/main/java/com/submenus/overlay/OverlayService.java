@@ -390,7 +390,7 @@ public class OverlayService extends Service implements MenuRepository.Listener, 
         });
         snapAnimator.addListener(new android.animation.AnimatorListenerAdapter() {
             @Override
-            public void onAnimationEnd(android.animation.Animation animation) {
+            public void onAnimationEnd(android.animation.Animator animation) {
                 persistBubblePosition();
             }
         });
