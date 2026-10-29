@@ -1,0 +1,139 @@
+name: Build APK
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      make_release:
+        description: "Publish the APK as a GitHub Release"
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and upload APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Show toolchain versions
+        run: |
+          java -version
+          gradle --version
+
+      - name: Run unit tests
+        run: |
+          set -o pipefail
+          gradle --no-daemon --console=plain testDebugUnitTest 2>&1 | tee build.log
+
+      - name: Build debug + release APKs
+        run: |
+          set -o pipefail
+          gradle --no-daemon --console=plain --stacktrace assembleDebug assembleRelease 2>&1 | tee build.log
+
+      - name: Report build errors as annotations
+        if: failure()
+        run: |
+          {
+            grep -E "error:|FAILURE:|Caused by:|FAILED|AssertionError|expected:" build.log 2>/dev/null || true
+            grep -A 30 "What went wrong" build.log 2>/dev/null || true
+          } | sed 's/^[[:space:]]*//' | awk 'NF' | head -n 60 | while IFS= read -r line; do
+            echo "::error::${line:0:900}"
+          done
+          exit 0
+
+      - name: Collect APK files
+        id: collect
+        run: |
+          set -euo pipefail
+          VERSION="$(grep -oP 'versionName\s+"\K[^"]+' app/build.gradle | head -n1)"
+          STAMP="$(date -u +%Y%m%d)"
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk \
+             "dist/SubwaySurfersModMenu-${VERSION}-debug-${STAMP}.apk"
+          cp app/build/outputs/apk/release/app-release.apk \
+             "dist/SubwaySurfersModMenu-${VERSION}-release-${STAMP}.apk"
+          ls -lh dist
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "stamp=${STAMP}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify APK manifest
+        run: |
+          AAPT="$(ls -1 "$ANDROID_HOME"/build-tools/*/aapt2 | tail -n1)"
+          APK="$(ls -1 dist/*-release-*.apk | head -n1)"
+          {
+            echo "### Verificación del APK"
+            echo ""
+            echo "\`\`\`"
+            "$AAPT" dump badging "$APK" 2>/dev/null \
+              | grep -E "package: name|launchable-activity|application-label:" || true
+            echo "provider authority: $("$AAPT" dump xmltree --file AndroidManifest.xml "$APK" 2>/dev/null \
+              | grep -oE 'authorities[^=]*="com\.submenus\.overlay\.settings"' | head -n1)"
+            echo "dex files: $(unzip -l "$APK" | grep -c '\.dex')"
+            echo "size: $(du -h "$APK" | cut -f1)"
+            echo "\`\`\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: SubwaySurfersModMenu-APK-${{ steps.collect.outputs.version }}
+          path: dist/*.apk
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/') || inputs.make_release == true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            TAG="$GITHUB_REF_NAME"
+          else
+            TAG="v${{ steps.collect.outputs.version }}"
+          fi
+          TITLE="Subway Surfers Mod Menu ${{ steps.collect.outputs.version }}"
+          NOTES="APK compilada automaticamente por GitHub Actions. La variante release esta firmada con el keystore de depuracion y se puede instalar directamente. Lee el README para las instrucciones de instalacion e integracion."
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/*.apk --clobber
+          else
+            gh release create "$TAG" dist/*.apk --title "$TITLE" --notes "$NOTES"
+          fi
+
+      - name: Job summary
+        run: |
+          {
+            echo "### APK generada"
+            echo ""
+            echo "| Archivo | Tamaño |"
+            echo "| --- | --- |"
+            for f in dist/*.apk; do
+              echo "| \`$(basename "$f")\` | $(du -h "$f" | cut -f1) |"
+            done
+            echo ""
+            echo "Descárgala desde la sección **Artifacts** de esta ejecución."
+          } >> "$GITHUB_STEP_SUMMARY"

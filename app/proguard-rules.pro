@@ -1,0 +1,4 @@
+-keep class com.submenus.overlay.bridge.** { *; }
+-keep class com.submenus.overlay.data.** { *; }
+-keep class com.submenus.overlay.OverlayService { *; }
+-keepattributes *Annotation*

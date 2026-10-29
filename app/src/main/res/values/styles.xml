@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.SubwayMenu" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/bg_deep</item>
+        <item name="android:statusBarColor">@color/bg_deep</item>
+        <item name="android:navigationBarColor">@color/bg_deep</item>
+        <item name="android:colorAccent">@color/accent_green</item>
+        <item name="android:colorPrimary">@color/accent_green</item>
+        <item name="android:colorPrimaryDark">@color/bg_deep</item>
+        <item name="android:colorControlActivated">@color/accent_green</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <style name="CardTitle">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <style name="BodyText">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:lineSpacingExtra">2dp</item>
+    </style>
+
+    <style name="CaptionText">
+        <item name="android:textColor">@color/text_muted</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="GradientButton">
+        <item name="android:background">@drawable/bg_button_gradient</item>
+        <item name="android:textColor">@color/bg_deep</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="GhostButton" parent="GradientButton">
+        <item name="android:background">@drawable/bg_button_ghost</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+</resources>
