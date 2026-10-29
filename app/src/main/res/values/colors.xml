@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base surfaces -->
+    <color name="bg_deep">#FF060910</color>
+    <color name="bg_surface">#FF0B1220</color>
+    <color name="bg_card">#FF111A29</color>
+    <color name="bg_card_high">#FF16213297</color>
+    <color name="stroke_soft">#FF22314A</color>
+    <color name="stroke_glow">#5522E07A</color>
+
+    <!-- Accents -->
+    <color name="accent_green">#FF22E07A</color>
+    <color name="accent_green_light">#FF5CF2A8</color>
+    <color name="accent_blue">#FF2CB6FF</color>
+    <color name="accent_blue_deep">#FF1E6BFF</color>
+    <color name="accent_orange">#FFFF9B3D</color>
+    <color name="accent_orange_deep">#FFFF6B2C</color>
+
+    <!-- Text -->
+    <color name="text_primary">#FFEAF2FF</color>
+    <color name="text_secondary">#FF9DB0CC</color>
+    <color name="text_muted">#FF6C8099</color>
+
+    <!-- Misc -->
+    <color name="success">#FF34E08A</color>
+    <color name="warning">#FFFFB347</color>
+    <color name="danger">#FFFF5C6C</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00000000</color>
+</resources>

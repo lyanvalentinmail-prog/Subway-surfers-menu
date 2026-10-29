@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Draw the floating menu on top of other apps. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- Keep the overlay alive while the user plays. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Lets the menu re-arm itself after a device reboot when the user enabled it. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!--
+        Normal permission used by the integration bridge. Any app that wants to read
+        the menu state has to declare:
+            <uses-permission android:name="com.submenus.overlay.permission.READ_MOD_SETTINGS" />
+    -->
+    <permission
+        android:name="com.submenus.overlay.permission.READ_MOD_SETTINGS"
+        android:label="@string/permission_read_settings_label"
+        android:protectionLevel="normal" />
+
+    <uses-permission android:name="com.submenus.overlay.permission.READ_MOD_SETTINGS" />
+
+    <application
+        android:name=".MenuApp"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SubwayMenu">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".InspectorActivity"
+            android:exported="false"
+            android:label="@string/inspector_title"
+            android:parentActivityName=".MainActivity" />
+
+        <service
+            android:name=".OverlayService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="floating mod menu overlay requested by the user" />
+        </service>
+
+        <receiver
+            android:name=".BootReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <provider
+            android:name=".bridge.SettingsProvider"
+            android:authorities="com.submenus.overlay.settings"
+            android:exported="true"
+            android:readPermission="com.submenus.overlay.permission.READ_MOD_SETTINGS"
+            android:writePermission="com.submenus.overlay.permission.READ_MOD_SETTINGS"
+            android:grantUriPermissions="false" />
+
+    </application>
+
+</manifest>

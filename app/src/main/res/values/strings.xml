@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Subway Surfers Mod Menu</string>
+    <string name="app_tagline">Menú flotante premium para tu partida</string>
+
+    <!-- Main screen -->
+    <string name="status_title">Estado del menú</string>
+    <string name="permission_label">Permiso de superposición</string>
+    <string name="permission_granted">Concedido</string>
+    <string name="permission_missing">Sin conceder</string>
+    <string name="service_label">Servicio flotante</string>
+    <string name="service_running">Activo</string>
+    <string name="service_stopped">Detenido</string>
+    <string name="bridge_label">Integración con el juego</string>
+    <string name="bridge_connected">Conectada · %1$s</string>
+    <string name="bridge_disconnected">Sin conexión</string>
+    <string name="btn_grant">Conceder permiso</string>
+    <string name="btn_start">Iniciar menú</string>
+    <string name="btn_stop">Detener menú</string>
+    <string name="btn_inspector">Ver datos del puente</string>
+    <string name="btn_reset">Restablecer todo</string>
+
+    <string name="features_title">Opciones rápidas</string>
+    <string name="features_hint">Los cambios se guardan al instante y se publican para la integración del juego.</string>
+
+    <string name="prefs_title">Apariencia y preferencias</string>
+    <string name="pref_haptics">Vibración al tocar</string>
+    <string name="pref_haptics_sub">Pequeña respuesta táctil en cada interruptor</string>
+    <string name="pref_animations">Animaciones</string>
+    <string name="pref_animations_sub">Transiciones y pulsos del botón flotante</string>
+    <string name="pref_snap">Pegar a los bordes</string>
+    <string name="pref_snap_sub">El botón se acomoda solo en el borde lateral</string>
+    <string name="pref_opacity">Opacidad del panel</string>
+    <string name="pref_size">Tamaño del botón flotante</string>
+
+    <string name="reset_title">Restablecer</string>
+    <string name="reset_sub">Vuelve a los valores de fábrica y apaga todas las opciones.</string>
+    <string name="reset_done">Configuración restablecida</string>
+    <string name="reset_confirm">¿Restablecer todos los valores guardados?</string>
+
+    <string name="dialog_ok">Aceptar</string>
+    <string name="dialog_cancel">Cancelar</string>
+    <string name="toast_permission_needed">Concede el permiso de superposición para mostrar el menú</string>
+    <string name="toast_service_started">Menú flotante iniciado</string>
+    <string name="toast_service_stopped">Menú flotante detenido</string>
+    <string name="toast_no_overlay_support">Este dispositivo no permite superposiciones</string>
+
+    <string name="notification_channel_name">Menú flotante</string>
+    <string name="notification_channel_desc">Mantiene el menú disponible mientras juegas</string>
+    <string name="notification_title">Subway Surfers Mod Menu</string>
+    <string name="notification_text">Menú flotante activo · toca para volver a la app</string>
+    <string name="notification_stop">Detener</string>
+
+    <!-- Overlay -->
+    <string name="overlay_title">MOD MENU</string>
+    <string name="overlay_subtitle">Subway Surfers</string>
+    <string name="tab_player">Player</string>
+    <string name="tab_collectibles">Collectibles</string>
+    <string name="tab_settings">Settings</string>
+    <string name="opt_speed">Speed</string>
+    <string name="opt_speed_sub">Multiplicador de velocidad del jugador</string>
+    <string name="opt_high_jump">High Jump</string>
+    <string name="opt_high_jump_sub">Impulso de salto</string>
+    <string name="opt_invincibility">Invincibility</string>
+    <string name="opt_invincibility_sub">Invencibilidad mientras esté activo</string>
+    <string name="opt_coin">Coin Multiplier</string>
+    <string name="opt_coin_sub">Multiplicador de monedas por recogida</string>
+    <string name="opt_keys">Keys Counter</string>
+    <string name="opt_keys_sub">Muestra el contador real de llaves reportado por el juego</string>
+    <string name="keys_reported">Llaves reportadas: %1$d</string>
+    <string name="keys_no_data">Sin datos todavía</string>
+    <string name="coins_reported">Monedas reportadas: %1$d</string>
+    <string name="overlay_bridge_connected">Conectado</string>
+    <string name="overlay_bridge_offline">Sin integración</string>
+    <string name="overlay_footer_hint">Los valores se publican en content://com.submenus.overlay.settings</string>
+    <string name="overlay_close">Cerrar menú</string>
+    <string name="overlay_open">Abrir menú</string>
+    <string name="action_reset_mods">Apagar todo</string>
+
+    <!-- Inspector -->
+    <string name="inspector_title">Puente de integración</string>
+    <string name="inspector_uri">URI del proveedor</string>
+    <string name="inspector_available">Disponible</string>
+    <string name="inspector_unavailable">No disponible</string>
+    <string name="inspector_heartbeat">Último heartbeat</string>
+    <string name="inspector_snapshot">Snapshot publicado</string>
+    <string name="inspector_copy">Copiar JSON</string>
+    <string name="inspector_copied">JSON copiado</string>
+    <string name="inspector_explain">Este JSON es lo que lee la integración del juego. Si ningún cliente envía un heartbeat, el menú lo informa como «sin conexión» en lugar de inventar resultados.</string>
+    <string name="inspector_none">Nunca</string>
+    <string name="inspector_seconds_ago">hace %1$d s</string>
+
+    <string name="permission_read_settings_label">Lee los ajustes del menú flotante</string>
+
+</resources>

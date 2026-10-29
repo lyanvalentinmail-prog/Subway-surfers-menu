@@ -1,0 +1,53 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.submenus.overlay'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.submenus.overlay"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+        resConfigs "en", "es"
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ""
+            minifyEnabled false
+        }
+        release {
+            // The release variant is signed with the CI debug keystore so that the
+            // APK produced by GitHub Actions can be installed directly from a phone.
+            minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/*.kotlin_module']
+        }
+    }
+}
+
+dependencies {
+    // Intentionally dependency-free: the whole app is built on the Android framework
+    // so the APK builds deterministically on GitHub Actions with no extra downloads.
+}
