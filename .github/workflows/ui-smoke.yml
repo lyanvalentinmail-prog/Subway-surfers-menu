@@ -63,45 +63,63 @@ jobs:
           disable-animations: false
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
           script: |
-            set -x
             mkdir -p out
-            adb wait-for-device
-            adb shell settings put global window_animation_scale 0
-            adb install -r app/build/outputs/apk/debug/app-debug.apk
-            # Pre-grant the overlay permission (equivalent to the user toggling it)
-            adb shell appops set com.submenus.overlay SYSTEM_ALERT_WINDOW allow
-            adb shell pm grant com.submenus.overlay android.permission.POST_NOTIFICATIONS || true
+            LOG=out/emulator.log
+            : > "$LOG"
+            run() {
+              echo "\$ $*" >> "$LOG"
+              "$@" >> "$LOG" 2>&1
+              echo "exit=$?" >> "$LOG"
+            }
 
-            # 1) Launcher screen
-            adb shell am start -W -n com.submenus.overlay/.MainActivity
+            echo "== devices ==" >> "$LOG"
+            adb devices >> "$LOG" 2>&1
+            echo "== kvm ==" >> "$LOG"
+            ls -l /dev/kvm >> "$LOG" 2>&1
+
+            run adb wait-for-device
+            run adb shell settings put global window_animation_scale 0
+            run adb install -r app/build/outputs/apk/debug/app-debug.apk
+            run adb shell appops set com.submenus.overlay SYSTEM_ALERT_WINDOW allow
+            run adb shell pm grant com.submenus.overlay android.permission.POST_NOTIFICATIONS
+
+            run adb shell am start -W -n com.submenus.overlay/.MainActivity
             sleep 4
-            adb shell screencap -p /sdcard/01-launcher.png
-            adb pull /sdcard/01-launcher.png out/ || true
+            run adb shell screencap -p /sdcard/01-launcher.png
+            run adb pull /sdcard/01-launcher.png out/01-launcher.png
 
-            # 2) Embedded menu + playable sandbox
-            adb shell am start -W -n com.submenus.overlay/.sandbox.SandboxActivity
+            run adb shell am start -W -n com.submenus.overlay/.sandbox.SandboxActivity
             sleep 6
-            adb shell input tap 540 1400
+            run adb shell input tap 540 1400
             sleep 2
-            adb shell input tap 540 1400
+            run adb shell input tap 540 1400
             sleep 2
-            adb shell screencap -p /sdcard/02-sandbox.png
-            adb pull /sdcard/02-sandbox.png out/ || true
+            run adb shell screencap -p /sdcard/02-sandbox.png
+            run adb pull /sdcard/02-sandbox.png out/02-sandbox.png
 
-            # 3) Floating overlay service (same menu, over other apps)
-            adb shell am start-foreground-service -n com.submenus.overlay/.OverlayService \
-              -a com.submenus.overlay.action.START || true
+            run adb shell am start-foreground-service -n com.submenus.overlay/.OverlayService -a com.submenus.overlay.action.START
             sleep 5
-            adb shell screencap -p /sdcard/03-overlay.png
-            adb pull /sdcard/03-overlay.png out/ || true
+            run adb shell screencap -p /sdcard/03-overlay.png
+            run adb pull /sdcard/03-overlay.png out/03-overlay.png
 
-            adb logcat -d > out/logcat.txt
-            adb shell dumpsys activity activities > out/activities.txt
-            adb shell dumpsys window windows > out/windows.txt || true
+            echo "== focus ==" >> "$LOG"
+            adb shell dumpsys window windows >> "$LOG" 2>&1
+            echo "== logcat ==" >> "$LOG"
+            adb logcat -d >> "$LOG" 2>&1
+
+            tail -n 40 "$LOG"
+            exit 0
 
       - name: Check for crashes and report
         if: always()
         run: |
+          if [ -f out/emulator.log ]; then
+            grep -E "^exit=[1-9]|^\$ |ERROR|error:|Exception|FATAL|installed|Success|Error" out/emulator.log \
+              | head -n 60 \
+              | while IFS= read -r line; do echo "::notice::${line:0:900}"; done
+          else
+            echo "::warning::No emulator log produced"
+          fi
           CRASHES="$(grep -c "FATAL EXCEPTION" out/logcat.txt 2>/dev/null || echo 0)"
           SANDBOX="$(grep -c "sandbox.SandboxActivity" out/activities.txt 2>/dev/null || echo 0)"
           OVERLAY="$(grep -c "OverlayService" out/logcat.txt 2>/dev/null || echo 0)"
