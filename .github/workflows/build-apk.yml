@@ -78,6 +78,20 @@ jobs:
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "stamp=${STAMP}" >> "$GITHUB_OUTPUT"
 
+      - name: Verify APK manifest
+        run: |
+          AAPT="$(ls -1 "$ANDROID_HOME"/build-tools/*/aapt2 | tail -n1)"
+          echo "aapt2: $AAPT"
+          {
+            "$AAPT" dump badging dist/*-release.apk 2>&1 | head -n 12
+            echo "--- permissions ---"
+            "$AAPT" dump permissions dist/*-release.apk 2>&1 | head -n 12
+            echo "--- dex/resource entries ---"
+            unzip -l dist/*-release.apk | grep -E "classes.dex|resources.arsc|AndroidManifest" 
+          } | while IFS= read -r line; do
+            echo "::notice::${line:0:900}"
+          done
+
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
