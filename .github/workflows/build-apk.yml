@@ -84,7 +84,7 @@ jobs:
           APK="$(ls -1 dist/*-release-*.apk | head -n1)"
           {
             "$AAPT" dump badging "$APK" 2>&1 | grep -E "launchable-activity|application-label:|sdkVersion|package: name" | head -n 6
-            echo "provider: $("$AAPT" dump xmltree --file AndroidManifest.xml "$APK" 2>/dev/null | grep -A2 'E: provider' | grep -oE 'com.submenus.overlay.settings' | head -n1)"
+            "$AAPT" dump xmltree --file AndroidManifest.xml "$APK" 2>/dev/null | grep -A12 'E: provider' | head -n 14
             echo "service:  $("$AAPT" dump xmltree --file AndroidManifest.xml "$APK" 2>/dev/null | grep -oE 'com\.submenus\.overlay\.OverlayService' | head -n1)"
             echo "dex: $(unzip -l "$APK" | grep -c '\.dex') archivo(s) classes.dex"
             echo "size: $(du -h "$APK" | cut -f1)"
