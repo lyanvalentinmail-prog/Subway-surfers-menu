@@ -45,7 +45,20 @@ jobs:
           gradle --version
 
       - name: Build debug + release APKs
-        run: gradle --no-daemon --stacktrace assembleDebug assembleRelease
+        run: |
+          set -o pipefail
+          gradle --no-daemon --console=plain --stacktrace assembleDebug assembleRelease 2>&1 | tee build.log
+
+      - name: Report build errors as annotations
+        if: failure()
+        run: |
+          grep -E "error:|error;|What went wrong|FAILURE:|Caused by:|^e: " build.log 2>/dev/null \
+            | head -n 40 \
+            | while IFS= read -r line; do
+                clean="${line//$'\r'/}"
+                echo "::error::${clean:0:900}"
+              done
+          exit 0
 
       - name: Collect APK files
         id: collect
