@@ -1,8 +1,12 @@
 name: UI Smoke Test
 
 # Manual on purpose: it boots a full Android emulator (slow), installs the APK and
-# checks that the embedded menu screen really runs. Run it from the Actions tab.
+# checks that the embedded menu screen really runs.
+#
+#   - Actions tab  -> "UI Smoke Test" -> Run workflow
+#   - or push a commit whose message contains [ui-smoke]
 on:
+  push:
   workflow_dispatch:
     inputs:
       api_level:
@@ -20,6 +24,8 @@ concurrency:
 jobs:
   emulator:
     name: Boot emulator and exercise the app
+    # Only run when explicitly requested, so normal pushes stay fast.
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message || '', '[ui-smoke]')
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
