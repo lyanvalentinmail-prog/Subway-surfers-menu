@@ -81,13 +81,13 @@ jobs:
       - name: Verify APK manifest
         run: |
           AAPT="$(ls -1 "$ANDROID_HOME"/build-tools/*/aapt2 | tail -n1)"
-          echo "aapt2: $AAPT"
+          APK="$(ls -1 dist/*-release-*.apk | head -n1)"
           {
-            "$AAPT" dump badging dist/*-release-*.apk 2>&1 | head -n 12
-            echo "--- permissions ---"
-            "$AAPT" dump permissions dist/*-release-*.apk 2>&1 | head -n 12
-            echo "--- dex/resource entries ---"
-            unzip -l dist/*-release-*.apk | grep -E "classes.dex|resources.arsc|AndroidManifest" 
+            "$AAPT" dump badging "$APK" 2>&1 | grep -E "launchable-activity|application-label:|sdkVersion|package: name" | head -n 6
+            echo "provider: $("$AAPT" dump xmltree --file AndroidManifest.xml "$APK" 2>/dev/null | grep -A2 'E: provider' | grep -oE 'com.submenus.overlay.settings' | head -n1)"
+            echo "service:  $("$AAPT" dump xmltree --file AndroidManifest.xml "$APK" 2>/dev/null | grep -oE 'com\.submenus\.overlay\.OverlayService' | head -n1)"
+            echo "dex: $(unzip -l "$APK" | grep -c '\.dex') archivo(s) classes.dex"
+            echo "size: $(du -h "$APK" | cut -f1)"
           } | while IFS= read -r line; do
             echo "::notice::${line:0:900}"
           done
