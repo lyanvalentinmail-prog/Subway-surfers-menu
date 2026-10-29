@@ -4,7 +4,7 @@
     <color name="bg_deep">#FF060910</color>
     <color name="bg_surface">#FF0B1220</color>
     <color name="bg_card">#FF111A29</color>
-    <color name="bg_card_high">#FF16213297</color>
+    <color name="bg_card_high">#FF162132</color>
     <color name="stroke_soft">#FF22314A</color>
     <color name="stroke_glow">#5522E07A</color>
 
