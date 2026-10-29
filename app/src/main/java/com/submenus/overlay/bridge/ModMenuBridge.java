@@ -127,6 +127,15 @@ public final class ModMenuBridge {
 
     /** Tells the menu that a real integration is alive, so it can show "connected". */
     public static void sendHeartbeat(Context context, String clientLabel) {
+        sendHeartbeat(context, clientLabel, -1, -1);
+    }
+
+    /**
+     * Heartbeat that also reports <b>real</b> values read from the running game, so the
+     * menu can display them (used by the Keys Counter). Pass a negative number to omit
+     * a value — the menu then shows "no data yet" instead of an invented zero.
+     */
+    public static void sendHeartbeat(Context context, String clientLabel, int keysCount, int coinsCount) {
         if (context == null) {
             return;
         }
@@ -134,6 +143,12 @@ public final class ModMenuBridge {
         Bundle extras = new Bundle();
         extras.putString(BridgeContract.EXTRA_CLIENT_LABEL, clientLabel);
         extras.putString(BridgeContract.EXTRA_CLIENT_PACKAGE, context.getPackageName());
+        if (keysCount >= 0) {
+            extras.putInt(BridgeContract.EXTRA_KEYS_COUNT, keysCount);
+        }
+        if (coinsCount >= 0) {
+            extras.putInt(BridgeContract.EXTRA_COINS_COUNT, coinsCount);
+        }
         try {
             resolver.call(Uri.parse(BridgeContract.URI_HEALTH), BridgeContract.METHOD_HEARTBEAT,
                     clientLabel, extras);

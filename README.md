@@ -32,7 +32,8 @@ pirata de Subway Surfers ni un inyector mágico:
 
 La integración es el archivo [`ModMenuBridge.java`](app/src/main/java/com/submenus/overlay/bridge/ModMenuBridge.java)
 más el contrato del puente; se pueden copiar tal cual en el módulo que ejecute del lado del
-juego, porque no dependen de nada más del proyecto.
+juego, porque no dependen de nada más del proyecto. La guía completa, con un cliente
+funcional, está en [`docs/INTEGRATION.md`](docs/INTEGRATION.md).
 
 ---
 
@@ -175,12 +176,7 @@ Para que el contador de llaves muestre **el valor real del juego**, la integraci
 en el heartbeat:
 
 ```java
-Bundle extras = new Bundle();
-extras.putInt("keys_count", game.keys());
-extras.putInt("coins_count", game.coins());
-context.getContentResolver().call(
-        Uri.parse("content://com.submenus.overlay.settings/health"),
-        "heartbeat", "Subway Surfers", extras);
+ModMenuBridge.sendHeartbeat(context, "Subway Surfers", game.keys(), game.coins());
 ```
 
 Si nunca se reporta nada, el panel muestra **“Sin datos todavía”** en lugar de un cero falso.
@@ -222,6 +218,8 @@ Subway-surfers-menu/
 │       │       ├── SliderRowView.java
 │       │       └── MenuPanelView.java   # Panel con categorías
 │       └── res/                         # Colores, estilos, textos es/en, layouts
+├── docs/INTEGRATION.md                  # Guía del puente con cliente completo
+├── app/src/test/java/…/MenuLimitsTest.java  # Tests JVM del contrato
 ├── build.gradle
 ├── settings.gradle
 ├── gradle.properties
