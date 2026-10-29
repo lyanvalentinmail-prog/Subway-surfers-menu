@@ -42,6 +42,14 @@
         </activity>
 
         <activity
+            android:name=".sandbox.SandboxActivity"
+            android:exported="false"
+            android:label="@string/sandbox_title"
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.SubwayMenu" />
+
+        <activity
             android:name=".InspectorActivity"
             android:exported="false"
             android:label="@string/inspector_title"

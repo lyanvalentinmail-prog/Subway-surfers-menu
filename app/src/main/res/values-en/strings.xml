@@ -90,4 +90,14 @@
 
     <string name="permission_read_settings_label">Read floating menu settings</string>
 
+    <!-- Embedded menu / sandbox -->
+    <string name="embedded_title">Embedded menu</string>
+    <string name="embedded_body">The same menu also lives inside the app — no overlay permission and no background service. The demo screen runs an endless game with the menu baked in: speed, jump, invincibility, coin multiplier and the keys counter really affect the run.</string>
+    <string name="btn_sandbox">Open the game with the menu inside</string>
+    <string name="sandbox_title">Sandbox Run · integrated menu</string>
+    <string name="sandbox_subtitle">Tap to jump</string>
+    <string name="sandbox_back">Back</string>
+    <string name="sandbox_hint">Tap the screen to jump · the floating button opens the menu</string>
+    <string name="sandbox_hud">Score %1$d · Coins %2$d · Keys %3$d</string>
+
 </resources>

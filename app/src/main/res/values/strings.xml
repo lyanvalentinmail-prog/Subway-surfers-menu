@@ -93,4 +93,14 @@
 
     <string name="permission_read_settings_label">Lee los ajustes del menú flotante</string>
 
+    <!-- Embedded menu / sandbox -->
+    <string name="embedded_title">Menú embebido</string>
+    <string name="embedded_body">El mismo menú también vive dentro de la app, sin permiso de superposición ni servicio. La pantalla de prueba corre un juego endless con el menú integrado: la velocidad, el salto, la invencibilidad, el multiplicador de monedas y el contador de llaves actúan de verdad sobre la partida.</string>
+    <string name="btn_sandbox">Abrir el juego con el menú dentro</string>
+    <string name="sandbox_title">Sandbox Run · menú integrado</string>
+    <string name="sandbox_subtitle">Toca para saltar</string>
+    <string name="sandbox_back">Volver</string>
+    <string name="sandbox_hint">Toca la pantalla para saltar · el botón flotante abre el menú</string>
+    <string name="sandbox_hud">Score %1$d · Monedas %2$d · Llaves %3$d</string>
+
 </resources>

@@ -34,6 +34,8 @@ public final class Prefs {
     // Runtime state
     public static final String KEY_BUTTON_X = "btn_x";
     public static final String KEY_BUTTON_Y = "btn_y";
+    public static final String KEY_EMBED_X = "embed_btn_x";
+    public static final String KEY_EMBED_Y = "embed_btn_y";
     public static final String KEY_MENU_ENABLED = "menu_enabled";
     public static final String KEY_SNAPSHOT_JSON = "published_snapshot_json";
     public static final String KEY_LAST_UPDATE = "published_updated_at";
@@ -200,6 +202,18 @@ public final class Prefs {
 
     public void setButtonPosition(int x, int y) {
         sp.edit().putInt(KEY_BUTTON_X, x).putInt(KEY_BUTTON_Y, y).apply();
+    }
+
+    public int getEmbeddedButtonX() {
+        return sp.getInt(KEY_EMBED_X, -1);
+    }
+
+    public int getEmbeddedButtonY() {
+        return sp.getInt(KEY_EMBED_Y, -1);
+    }
+
+    public void setEmbeddedButtonPosition(int x, int y) {
+        sp.edit().putInt(KEY_EMBED_X, x).putInt(KEY_EMBED_Y, y).apply();
     }
 
     public boolean isMenuEnabled() {

@@ -92,6 +92,8 @@ public class MainActivity extends Activity implements MenuRepository.Listener {
         buildPreferenceRows();
 
         toggleButton.setOnClickListener(v -> onToggleServiceClicked());
+        findViewById(R.id.btn_sandbox).setOnClickListener(v ->
+                startActivity(new Intent(this, com.submenus.overlay.sandbox.SandboxActivity.class)));
         findViewById(R.id.btn_inspector).setOnClickListener(v ->
                 startActivity(new Intent(this, InspectorActivity.class)));
         findViewById(R.id.btn_reset).setOnClickListener(v -> confirmReset());
