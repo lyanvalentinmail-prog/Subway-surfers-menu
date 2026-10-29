@@ -57,12 +57,12 @@ jobs:
       - name: Report build errors as annotations
         if: failure()
         run: |
-          grep -E "error:|error;|What went wrong|FAILURE:|Caused by:|^e: " build.log 2>/dev/null \
-            | head -n 40 \
-            | while IFS= read -r line; do
-                clean="${line//$'\r'/}"
-                echo "::error::${clean:0:900}"
-              done
+          {
+            grep -E "error:|FAILURE:|Caused by:|FAILED|AssertionError|expected:" build.log 2>/dev/null || true
+            grep -A 30 "What went wrong" build.log 2>/dev/null || true
+          } | sed 's/^[[:space:]]*//' | awk 'NF' | head -n 60 | while IFS= read -r line; do
+            echo "::error::${line:0:900}"
+          done
           exit 0
 
       - name: Collect APK files
