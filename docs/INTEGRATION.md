@@ -9,6 +9,17 @@ consuma; si nadie lo consume, el panel muestra “Sin integración” y no inven
 
 ---
 
+## 0. Dos formas de integrarlo
+
+| Forma | Cuándo usarla | Qué necesitás |
+| --- | --- | --- |
+| **Embebida** (recomendada si tenés el código) | Querés el menú **dentro de la app**, en tu propia pantalla | `EmbeddedMenu.attach(activity)` + `MenuRepository` |
+| **Flotante** (overlay) | Querés el menú encima de otra app | El APK del menú + el puente (`ContentProvider`) |
+
+El modo embebido no requiere permisos ni servicio: el menú se agrega como vista dentro de tu
+activity y escribe en `MenuRepository`, que tu juego lee en el mismo proceso. El modo flotante
+usa el `ContentProvider` que se describe abajo.
+
 ## 1. Archivos del puente
 
 Copiá estos cinco archivos del proyecto del menú a tu módulo de integración:

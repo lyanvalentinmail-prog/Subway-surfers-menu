@@ -2,10 +2,17 @@
 
 ![Build APK](https://github.com/lyanvalentinmail-prog/Subway-surfers-menu/actions/workflows/build-apk.yml/badge.svg)
 
-Menú flotante **premium en tema oscuro** para Android, escrito en **Java puro + Gradle**,
-pensado para acompañar una partida de Subway Surfers: un botón circular arrastrable abre un
-panel con interruptores animados (verdes, azules y naranjas), tres categorías y guardado
-local automático.
+Menú **premium en tema oscuro** para Android, escrito en **Java puro + Gradle**: un botón
+circular arrastrable abre un panel con interruptores animados (verdes, azules y naranjas),
+tres categorías y guardado local automático.
+
+Viene en **dos modos, el mismo código de menú**:
+
+1. **Embebido (integrado en la app)** — pantalla **Sandbox Run**: un juego endless jugable
+   donde Speed, High Jump, Invincibility, Coin Multiplier y Keys Counter **modifican la
+   partida de verdad**. Sin permiso de superposición ni servicio en segundo plano.
+2. **Flotante (sobre otras apps)** — el mismo menú como overlay arrastrable, para usarlo
+   encima de cualquier juego mediante el puente de integración documentado.
 
 La APK se compila **desde GitHub, sin computadora**, con el workflow incluido: entras a la
 pestaña *Actions*, ejecutas el build y descargas el `.apk` desde *Artifacts* (o desde
@@ -30,6 +37,12 @@ pirata de Subway Surfers ni un inyector mágico:
 > inexistentes. Por eso el menú publica el estado en un contrato estable y **muestra si hay
 > un cliente conectado**. Cuando no lo hay, lo dice sin adornos.
 
+> **Sobre “modificar la app del juego”:** este repositorio no incluye ni parchea el APK de
+> Subway Surfers (es software propietario y redistribuirlo modificado no es legal). Lo que sí
+> incluye es una app propia **con el menú ya integrado dentro** (modo 1) y el puente para
+> integrarlo en cualquier proyecto del que tengas el código. Esa es la forma realista y
+> legítima de “tener el menú dentro de la app”.
+
 La integración es el archivo [`ModMenuBridge.java`](app/src/main/java/com/submenus/overlay/bridge/ModMenuBridge.java)
 más el contrato del puente; se pueden copiar tal cual en el módulo que ejecute del lado del
 juego, porque no dependen de nada más del proyecto. La guía completa, con un cliente
@@ -38,6 +51,17 @@ funcional, está en [`docs/INTEGRATION.md`](docs/INTEGRATION.md).
 ---
 
 ## ✨ Características
+
+### Menú embebido (modo integrado)
+- `EmbeddedMenu.attach(activity)` agrega el menú **dentro de tu propia pantalla**: mismo
+  botón circular, mismo panel, sin `SYSTEM_ALERT_WINDOW` y sin servicio.
+- Pantalla **Sandbox Run** (`sandbox/SandboxActivity`) con un runner endless dibujado en
+  `Canvas`: saltás tocando, esquivás obstáculos, juntás monedas y llaves.
+- Las opciones del menú se aplican **en caliente** al juego: velocidad, impulso de salto,
+  invencibilidad (los obstáculos no te matan), multiplicador de monedas y contador de llaves
+  real.
+- El runner reporta sus contadores con `ModMenuBridge.sendHeartbeat(...)`, así el menú
+  flotante también muestra números reales cuando está abierto encima.
 
 ### Menú flotante
 - **Botón circular arrastrable** con halo pulsante, icono de rayo, sombra y feedback de presión.
@@ -183,11 +207,44 @@ Si nunca se reporta nada, el panel muestra **“Sin datos todavía”** en lugar
 
 ---
 
+## 🧱 Usar el menú embebido en tu propia pantalla
+
+```java
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_game);
+
+    // Menú dentro de esta activity: sin permiso de superposición.
+    EmbeddedMenu menu = EmbeddedMenu.attach(this);
+    menu.showPanel();       // opcional: abre el panel desde un botón del menú principal
+    // menu.hidePanel();
+    // menu.refreshBridgeState();
+    // menu.detach();       // en onDestroy()
+}
+```
+
+Y para leer los valores dentro de tu juego:
+
+```java
+MenuRepository repo = MenuRepository.get(context);
+float speed  = repo.isSpeedEnabled() ? repo.getSpeed() : 1f;
+float jump   = repo.isHighJumpEnabled() ? repo.getHighJump() : 1f;
+boolean inv  = repo.isInvincibilityEnabled();
+int coins    = repo.isCoinMultiplierEnabled() ? repo.getCoinMultiplier() : 1;
+// o reaccionar a cambios:
+repo.addListener(snapshot -> applyToGame(snapshot));
+```
+
+Así funciona exactamente `sandbox/RunGameView.java`, que es la referencia de integración más
+corta: lee el snapshot y cambia la física, el daño y las recompensas de la partida.
+
 ## 🗂️ Estructura del proyecto
 
 ```
 Subway-surfers-menu/
 ├── .github/workflows/build-apk.yml      # CI: compila y publica la APK
+├── .github/workflows/ui-smoke.yml        # CI opcional: instala la APK en un emulador
 ├── app/
 │   ├── build.gradle
 │   ├── proguard-rules.pro
@@ -211,6 +268,7 @@ Subway-surfers-menu/
 │       │   │   └── MenuRepository.java  # Estado + publicación
 │       │   └── ui/
 │       │       ├── Theme.java
+│       │       ├── EmbeddedMenu.java    # Menú DENTRO de una activity (sin permiso)
 │       │       ├── BubbleView.java      # Botón circular dibujado a mano
 │       │       ├── DragController.java  # Arrastre + tap
 │       │       ├── ToggleSwitch.java    # Interruptor animado
@@ -253,6 +311,7 @@ Si usás Android Studio, abrí la carpeta del proyecto y aceptá cuando ofrezca 
 | El botón desaparece al abrir un juego | Algunos fabricantes (Xiaomi, Huawei, Samsung) matan servicios en segundo plano: activá *Autostart* / *Sin restricciones de batería* para la app. |
 | Dice “Sin integración” en el panel | Es correcto: ningún cliente envió heartbeat. Es el comportamiento honesto, no un error. |
 | Android 14 no muestra la notificación | Concedé el permiso de notificaciones cuando la app lo pida; el menú funciona igual. |
+| El workflow *UI Smoke Test* no es concluyente | Es opcional: necesita un runner con KVM y descarga de imágenes de emulador. Un push normal nunca lo ejecuta. |
 | El build falla en Actions por SDK | Ejecutá de nuevo el workflow: la primera ejecución a veces espera la caché del SDK. Revisá *Logs* del paso que falló. |
 
 ---
