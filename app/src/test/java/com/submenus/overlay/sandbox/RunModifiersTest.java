@@ -27,8 +27,8 @@ public class RunModifiersTest {
                 .speedMultiplier(2.5f)
                 .highJumpMultiplier(2.5f)
                 .build();
-        assertEquals(1f, RunModifiers.from(off).horizontalSpeed(100f), 0.0001f);
-        assertEquals(1f, RunModifiers.from(off).jumpImpulse(100f), 0.0001f);
+        assertEquals(100f, RunModifiers.from(off).horizontalSpeed(100f), 0.0001f);
+        assertEquals(100f, RunModifiers.from(off).jumpImpulse(100f), 0.0001f);
 
         MenuSnapshot on = MenuSnapshot.builder()
                 .speedEnabled(true).speedMultiplier(2.5f)

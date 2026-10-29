@@ -45,7 +45,9 @@ jobs:
           gradle --version
 
       - name: Run unit tests
-        run: gradle --no-daemon --console=plain testDebugUnitTest
+        run: |
+          set -o pipefail
+          gradle --no-daemon --console=plain testDebugUnitTest 2>&1 | tee build.log
 
       - name: Build debug + release APKs
         run: |

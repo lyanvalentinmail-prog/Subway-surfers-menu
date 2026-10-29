@@ -47,6 +47,13 @@ android {
     }
 }
 
+tasks.withType(Test).configureEach {
+    testLogging {
+        events "failed", "skipped"
+        exceptionFormat "full"
+    }
+}
+
 dependencies {
     // The app itself is dependency-free: everything is built on the Android framework,
     // so the APK compiles deterministically on GitHub Actions.
